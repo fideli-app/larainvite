@@ -195,7 +195,7 @@ class Invitation implements InvitationInterface
             return $this;
         }
         try {
-            $this->instance = (new $inviteModel)->where('token', $this->token)->firstOrFail();
+            $this->instance = $inviteModel::where('token', $this->token)->firstOrFail();
         } catch (ModelNotFoundException $e) {
             throw new Exception("Invalid Token {$this->token}", 1);
         }
