@@ -14,14 +14,14 @@ interface InvitationInterface
     public function invite($email, $referral, $expires);
     
     /**
-     * Set referral code and LaraInviteModel instance
-     * @param string $code referral Code
+     * Set referral token and Invite instance
+     * @param string $token referral Code
      */
-    public function setCode($code);
+    public function setToken($token);
 
     /**
      * Returns Invitation record
-     * @return Junaidnasir\Larainvite\Models\LaraInviteModel
+     * @return Junaidnasir\Larainvite\Models\Invite
      */
     public function get();
 

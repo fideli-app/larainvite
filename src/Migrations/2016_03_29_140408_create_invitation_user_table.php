@@ -12,13 +12,14 @@ class CreateInvitationUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_invitations', function (Blueprint $table) {
-            $table->BigIncrements('id');
-            $table->string('code')->index();
+        Schema::create(config('larainvite.table_name'), function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('token')->index();
             $table->string('email');
-            $table->BigInteger('user_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned();
             $table->enum('status', ['pending', 'successful','canceled','expired']);
-            $table->datetime('valid_till');
+            $table->timestamp('expired_at');
+            $table->timestamp('consumed_at');
             $table->timestamps();
         });
     }
@@ -30,6 +31,6 @@ class CreateInvitationUserTable extends Migration
      */
     public function down()
     {
-        Schema::drop('user_invitations');
+        Schema::drop(config('larainvite.table_name'));
     }
 }

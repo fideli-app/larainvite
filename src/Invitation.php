@@ -8,13 +8,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 /**
 *   Laravel Invitation class
 */
-class LaraInvite implements InvitationInterface
+class Invitation implements InvitationInterface
 {
-    /**
-     * Invitation Model
-     * @var string
-     */
-    protected static $model = 'Junaidnasir\Larainvite\Models\LaraInviteModel';
     
     /**
      * Email address to invite
@@ -23,10 +18,10 @@ class LaraInvite implements InvitationInterface
     private $email;
 
     /**
-     * Referral Code for invitation
+     * Referral token for invitation
      * @var string
      */
-    private $code = null;
+    private $token = null;
 
     /**
      * integer ID of referral
@@ -36,13 +31,13 @@ class LaraInvite implements InvitationInterface
 
     /**
      * DateTime of referral code expiration
-     * @var DateTime
+     * @var Carbon
      */
     private $expires;
 
     /**
      * Invitation Model
-     * @var Junaidnasir\Larainvite\Models\LaraInviteModel
+     * @var Junaidnasir\Larainvite\Models\Invite
      */
     private $instance = null;
     
@@ -54,15 +49,15 @@ class LaraInvite implements InvitationInterface
         $this->readyPayload($email, $referral, $expires)
              ->createInvite()
              ->publishEvent('invited');
-        return $this->code;
+        return $this->token;
     }
     
     /**
      * {@inheritdoc}
      */
-    public function setCode($code)
+    public function setToken($token)
     {
-        $this->code = $code;
+        $this->token = $token;
         $this->getModelInstance(false);
         return $this;
     }
@@ -90,6 +85,7 @@ class LaraInvite implements InvitationInterface
     {
         if ($this->isValid()) {
             $this->instance->status = 'successful';
+            $this->instance->consumed_at = new Carbon();
             $this->instance->save();
             $this->publishEvent('consumed');
             return true;
@@ -124,7 +120,7 @@ class LaraInvite implements InvitationInterface
      */
     public function isExpired()
     {
-        if (strtotime($this->instance->valid_till) >= time()) {
+        if (! $this->instance->expired_at->isPast()) {
             return false;
         }
         $this->instance->status = 'expired';
@@ -138,7 +134,7 @@ class LaraInvite implements InvitationInterface
      */
     public function isPending()
     {
-        return ($this->instance->status == 'pending') ? true : false;
+        return $this->instance->status === 'pending';
     }
 
     /**
@@ -146,7 +142,7 @@ class LaraInvite implements InvitationInterface
      */
     public function isAllowed($email)
     {
-        return (($this->instance->email == $email) && $this->isValid());
+        return ($this->instance->email === $email) && $this->isValid();
     }
     
     /**
@@ -155,8 +151,7 @@ class LaraInvite implements InvitationInterface
      */
     public function reminder()
     {
-        Event::fire('junaidnasir.larainvite.invited', $this->instance, false);
-        return true;
+        return $this->publishEvent('invited');
     }
 
     /**
@@ -165,25 +160,25 @@ class LaraInvite implements InvitationInterface
      */
     private function createInvite()
     {
-        $code = md5(uniqid());
-        return $this->save($code);
+        $token = md5(uniqid());
+        return $this->save($token);
     }
 
     /**
      * saves invitation in DB
-     * @param  string $code referral code
+     * @param  string $token referral code
      * @return self
      */
-    private function save($code)
+    private function save($token)
     {
         $this->getModelInstance();
         $this->instance->email      = $this->email;
         $this->instance->user_id    = $this->referral;
-        $this->instance->valid_till = $this->expires;
-        $this->instance->code       = $code;
+        $this->instance->expired_at = $this->expires;
+        $this->instance->token      = $token;
         $this->instance->save();
 
-        $this->code = $code;
+        $this->token = $token;
         return $this;
     }
 
@@ -194,17 +189,18 @@ class LaraInvite implements InvitationInterface
      */
     private function getModelInstance($allowNew = true)
     {
-        //if (is_null($this->code) && $allowNew) {
+        $inviteModel = static::inviteModel();
         if ($allowNew) {
-            $this->instance = new static::$model;
+            $this->instance = new $inviteModel;
             return $this;
         }
         try {
-            $this->instance = (new static::$model)->where('code', $this->code)->firstOrFail();
-            return $this;
+            $this->instance = (new $inviteModel)->where('token', $this->token)->firstOrFail();
         } catch (ModelNotFoundException $e) {
-            throw new Exception("Invalid Token {$this->code}", 1);
+            throw new Exception("Invalid Token {$this->token}", 1);
         }
+        
+        return $this;
     }
 
     /**
@@ -229,7 +225,13 @@ class LaraInvite implements InvitationInterface
      */
     private function publishEvent($event)
     {
-        Event::fire('junaidnasir.larainvite.'.$event, $this->instance, false);
+        Event::fire('larainvite.'.$event, $this->instance, false);
         return $this;
+    }
+    
+    
+    private static function inviteModel()
+    {
+        return config('larainvite.invite_model');
     }
 }

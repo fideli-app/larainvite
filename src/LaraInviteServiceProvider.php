@@ -31,7 +31,7 @@ class LaraInviteServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(__DIR__.'/Config/larainvite.php', 'larainvite');
         $this->app->singleton('invite', function ($app) {
-            $laravelImplementation = new \Junaidnasir\Larainvite\LaraInvite();
+            $laravelImplementation = new \Junaidnasir\Larainvite\Invitation();
             return new \Junaidnasir\Larainvite\UserInvitation($laravelImplementation);
         });
     }

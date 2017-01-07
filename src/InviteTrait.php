@@ -8,25 +8,25 @@ trait InviteTrait
      * return all invitation as laravel collection
      * @return hasMany invitation Models
      */
-    public function invitations()
+    public function invites()
     {
-        return $this->hasMany('Junaidnasir\Larainvite\Models\LaraInviteModel');
+        return $this->hasMany(Junaidnasir\Larainvite\Models\Invite::class);
     }
 
     /**
      * return successful initation by a user
      * @return hasMany
      */
-    public function invitationSuccess()
+    public function successfulInvites()
     {
-        return $this->invitations()->where('status', 'successful');
+        return $this->invites()->where('status', 'successful');
     }
     /**
      * return pending invitations by a user
      * @return hasMany
      */
-    public function invitationPending()
+    public function pendingInvites()
     {
-        return $this->invitations()->where('status', 'pending');
+        return $this->invites()->where('status', 'pending');
     }
 }

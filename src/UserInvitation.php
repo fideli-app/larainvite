@@ -1,69 +1,69 @@
 <?php namespace Junaidnasir\Larainvite;
 
-use \Exception;
+use Exception;
 use Carbon\Carbon;
-use Junaidnasir\Larainvite\invitationInterface;
+use Junaidnasir\Larainvite\InvitationInterface;
 
 /**
 * User Invitation class
 */
 class UserInvitation
 {
-    private $interface;
-    function __construct(invitationInterface $interface)
+    private $invite;
+    function __construct(InvitationInterface $invite)
     {
-        $this->interface = $interface;
+        $this->invite = $invite;
     }
 
     public function invite($email, $referral, $expires = null)
     {
-        $expires = (is_null($expires)) ? Carbon::now()->addHour(config('larainvite.expires')) : $expires;
+        $expires = $expires === null ? Carbon::now()->addHour(config('larainvite.expires')) : $expires;
         $this->validateEmail($email);
-        return $this->interface->invite($email, $referral, $expires);
+        return $this->invite->invite($email, $referral, $expires);
     }
 
-    public function get($code)
+    public function get($token)
     {
-        return $this->interface->setCode($code)->get();
+        return $this->invite->setToken($token)->get();
     }
 
-    public function status($code)
+    public function status($token)
     {
-        return $this->interface->setCode($code)->status();
+        return $this->invite->setToken($token)->status();
     }
 
-    public function isValid($code)
+    public function isValid($token)
     {
-        return $this->interface->setCode($code)->isValid();
+        return $this->invite->setToken($token)->isValid();
     }
 
-    public function isExpired($code)
+    public function isExpired($token)
     {
-        return $this->interface->setCode($code)->isExpired();
+        return $this->invite->setToken($token)->isExpired();
     }
 
-    public function isPending($code)
+    public function isPending($token)
     {
-        return $this->interface->setCode($code)->isPending();
+        return $this->invite->setToken($token)->isPending();
     }
 
-    public function isAllowed($code, $email)
+    public function isAllowed($token, $email)
     {
-        return $this->interface->setCode($code)->isAllowed($email);
+        return $this->invite->setToken($token)->isAllowed($email);
     }
-    public function consume($code)
+    public function consume($token)
     {
-        return $this->interface->setCode($code)->consume();
-    }
-
-    public function cancel($code)
-    {
-        return $this->interface->setCode($code)->cancel();
+        return $this->invite->setToken($token)->consume();
     }
 
-    public function reminder($code)
+    public function cancel($token)
     {
-        return $this->interface->setCode($code)->reminder();
+        return $this->invite->setToken($token)->cancel();
+    }
+
+    public function reminder($token)
+    {
+        return $this->invite->setToken($token)->reminder();
     }
     public function validateEmail($email)
     {
