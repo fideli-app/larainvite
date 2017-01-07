@@ -24,7 +24,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Invite extends Model
 {
-    
     protected $fillable = [
         'user_id',
         'token',
@@ -54,10 +53,10 @@ class Invite extends Model
         'updated_at' => 'date',
     ];
     
-    public function __construct(array $attributes = []) {
-      $this->table_name = config('larainvite.table_name');
-      
-      parent::__construct($attributes);
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->setTable(config('larainvite.table_name'));
     }
     
     /**
