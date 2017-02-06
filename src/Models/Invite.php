@@ -21,13 +21,5 @@ namespace Junaidnasir\Larainvite\Models;
  */
 class Invite extends Model
 {
-    use \Junaidnasir\Larainvite\Traits\InviteModelTrait
-    {
-        __construct as private _inviteModelTraitConstructor;
-    }
-    
-    public function __construct(array $attributes = []) {
-        parent::__construct($attributes);
-        $this->_inviteModelTraitConstructor($attributes, __CLASS__);
-    }
+    use \Junaidnasir\Larainvite\Traits\InviteModelTrait;
 }
