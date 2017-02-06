@@ -2,9 +2,6 @@
 
 namespace Junaidnasir\Larainvite\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-
 /**
  * Class Invite
  *
@@ -24,46 +21,5 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Invite extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'token',
-        'email',
-        'status',
-        'expired_at',
-        'consumed_at',
-    ];
-
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
-        'expired_at',
-        'consumed_at',
-    ];
-
-    protected $casts = [
-        'user_id'     => 'int',
-        'token'       => 'string',
-        'email'       => 'string',
-        'status'      => 'string',
-        'consumed_at' => 'date',
-        'expired_at'  => 'date',
-
-        'created_at' => 'date',
-        'updated_at' => 'date',
-    ];
-    
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        $this->setTable(config('larainvite.table_name'));
-    }
-    
-    /**
-     * Referral User
-     */
-    public function user()
-    {
-        return $this->belongsTo(config('larainvite.user_model'));
-    }
+    use \Junaidnasir\Larainvite\Traits\InviteModelTrait;
 }
