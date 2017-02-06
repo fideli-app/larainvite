@@ -54,7 +54,9 @@ trait InviteModelTrait
     
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
+        if (func_num_args() < 2 || func_get_arg(1) !== __CLASS__) {
+            parent::__construct($attributes);
+        }
         $this->setTable(config('larainvite.table_name'));
     }
     
