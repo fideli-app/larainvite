@@ -23,7 +23,7 @@ class Invite extends Model
 {
     use \Junaidnasir\Larainvite\Traits\InviteModelTrait
     {
-        __construct as private _inviteModelTraitContructor;
+        __construct as private _inviteModelTraitConstructor;
     }
     
     public function __construct(array $attributes = []) {
